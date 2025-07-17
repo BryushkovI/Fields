@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../css/style.css" /> 
+    <title></title>
+</head>
+<body>
+    <div class="container">
+        <h1>Запросы</h1>
+
+        <!-- Форма 1: Запрашивает все записи -->
+        <form id="allRecordsForm" action="Locations">
+            <h2>Все записи</h2>
+            <button type="submit">Получить все записи</button>
+        </form>
+        <hr />
+        <!-- Форма 2: Запрашивает площадь по ID -->
+        <form id="areaForm" action="Area">
+            <h2>Запрос площади</h2>
+            <label for="idArea">ID:</label>
+            <input type="number" id="id" name="id" required>
+            <button type="submit">Запросить площадь</button>
+        </form>
+        <hr />
+        <!-- Форма 3: Запрашивает расстояние по координатам и ID -->
+        <form id="distanceForm" action="Distance">
+            <h2>Запрос расстояния</h2>
+            <label for="lat">Широта:</label>
+            <input type="number" step="any" id="lat" name="lat" required>
+
+            <label for="lng">Долгота:</label>
+            <input type="number" step="any" id="lng" name="lng" required>
+
+            <label for="id">ID:</label>
+            <input type="number" id="id" name="id" required>
+
+            <button type="submit">Запросить расстояние</button>
+        </form>
+        <hr />
+        <!-- Форма 4: Запрашивает принадлежность точки к полю -->
+        <form id="pointBelongingForm" action="Belonging">
+            <h2>Принадлежность точки к полю</h2>
+            <label for="lat">Широта:</label>
+            <input type="number" step="any" id="lat" name="lat" required>
+
+            <label for="lat">Долгота:</label>
+            <input type="number" step="any" id="lng" name="lng" required>
+
+            <label for="idField">ID:</label>
+            <input type="number" id="idField" name="idField" required>
+
+            <label for="name">Имя поля:</label>
+            <input type="text" id="name" name="name" required>
+
+            <button type="submit">Проверить принадлежность</button>
+        </form>
+    </div>
+</body>
+</html>
