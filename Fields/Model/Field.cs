@@ -4,10 +4,22 @@ namespace Fields.Model
 {
     public class Field
     {
-        public int fid { get; init; }
+        public Locations _locations;
+
+        public int Id { get; init; }
         public string Name { get; init; }
-        public IList<(decimal lat,decimal lng)> Cordinates { get; init; }
-        public (decimal, decimal) CentrCordinates { get; init; }
-        public decimal Area { get; set; }
+        
+        public Locations Locations
+        {
+            get => _locations;
+            set => _locations = value;
+        }
+
+        public decimal Size { get; set; }
+
+        public void SetCenter(Point coordinates)
+        {
+            _locations.SetCenter(coordinates);
+        }
     }
 }

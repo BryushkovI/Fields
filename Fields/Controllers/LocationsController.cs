@@ -1,5 +1,7 @@
 ﻿using Fields.Model;
+using Fields.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections;
 
 namespace Fields.Controllers
 {
@@ -10,7 +12,7 @@ namespace Fields.Controllers
         [Route("[controller]")]
         public async Task<IResult> Index()
         {
-            IEnumerable<Field> fields = [];
+            IEnumerable<Field> fields = DataProvider.ParseFieldsKML();
             return Results.Json(fields) ;
         }
     }

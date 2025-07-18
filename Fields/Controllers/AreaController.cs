@@ -13,7 +13,7 @@ namespace Fields.Controllers
         public async Task<double> Get(int id)
         {
 
-            return Geometry.AreaInMetrs(DataProvider.ParseFieldKML(id).Cordinates);
+            return Geometry.AreaInMetrs(DataProvider.ParseFieldKML(id).Locations.Polygon);
         }
     }
 }

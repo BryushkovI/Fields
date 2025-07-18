@@ -71,7 +71,7 @@ namespace Fields.Model
             return azimuts;
         }
 
-        static public IList<(int angleNumber, double azimutNext, double azimutPrev)> GetListAz(IList<(decimal lat, decimal lng)> coordinates)
+        static public IList<(int angleNumber, double azimutNext, double azimutPrev)> GetListAz(IList<Point> coordinates)
         {
             //coordinates.Add(coordinates[0]);
             coordinates.Insert(0, coordinates[coordinates.Count - 2]);
@@ -82,28 +82,28 @@ namespace Fields.Model
 
                 var azimutNextRad =
                 Math.Atan2(
-                    Math.Sin(double.DegreesToRadians((double)DeltaAngle(coordinates[i].lng, coordinates[i + 1].lng)))
-                  * Math.Cos(double.DegreesToRadians((double)coordinates[i + 1].lat)),
+                    Math.Sin(double.DegreesToRadians((double)DeltaAngle(coordinates[i].Lng, coordinates[i + 1].Lng)))
+                  * Math.Cos(double.DegreesToRadians((double)coordinates[i + 1].Lat)),
 
-                    Math.Cos(double.DegreesToRadians((double)coordinates[i].lat))
-                  * Math.Sin(double.DegreesToRadians((double)coordinates[i + 1].lat))
+                    Math.Cos(double.DegreesToRadians((double)coordinates[i].Lat))
+                  * Math.Sin(double.DegreesToRadians((double)coordinates[i + 1].Lat))
             -
-                    Math.Sin(double.DegreesToRadians((double)coordinates[i].lat))
-                  * Math.Cos(double.DegreesToRadians((double)coordinates[i + 1].lat))
-                  * Math.Cos(double.DegreesToRadians((double)DeltaAngle(coordinates[i].lng, coordinates[i + 1].lng))
+                    Math.Sin(double.DegreesToRadians((double)coordinates[i].Lat))
+                  * Math.Cos(double.DegreesToRadians((double)coordinates[i + 1].Lat))
+                  * Math.Cos(double.DegreesToRadians((double)DeltaAngle(coordinates[i].Lng, coordinates[i + 1].Lng))
                 ));
 
                 var azimutPrevRad =
                 Math.Atan2(
-                    Math.Sin(double.DegreesToRadians((double)DeltaAngle(coordinates[i].lng, coordinates[i - 1].lng)))
-                  * Math.Cos(double.DegreesToRadians((double)coordinates[i - 1].lat)),
+                    Math.Sin(double.DegreesToRadians((double)DeltaAngle(coordinates[i].Lng, coordinates[i - 1].Lng)))
+                  * Math.Cos(double.DegreesToRadians((double)coordinates[i - 1].Lat)),
 
-                    Math.Cos(double.DegreesToRadians((double)coordinates[i].lat))
-                  * Math.Sin(double.DegreesToRadians((double)coordinates[i - 1].lat))
+                    Math.Cos(double.DegreesToRadians((double)coordinates[i].Lat))
+                  * Math.Sin(double.DegreesToRadians((double)coordinates[i - 1].Lat))
             -
-                    Math.Sin(double.DegreesToRadians((double)coordinates[i].lat))
-                  * Math.Cos(double.DegreesToRadians((double)coordinates[i - 1].lat))
-                  * Math.Cos(double.DegreesToRadians((double)DeltaAngle(coordinates[i].lng, coordinates[i - 1].lng))
+                    Math.Sin(double.DegreesToRadians((double)coordinates[i].Lat))
+                  * Math.Cos(double.DegreesToRadians((double)coordinates[i - 1].Lat))
+                  * Math.Cos(double.DegreesToRadians((double)DeltaAngle(coordinates[i].Lng, coordinates[i - 1].Lng))
                 ));
 
                 azimuts.Add((i,azimutNextRad * 180 / Math.PI, azimutPrevRad * 180 / Math.PI));
@@ -132,7 +132,8 @@ namespace Fields.Model
             return rem;
         }
 
-        static public double AreaInMetrs(IList<(decimal lat, decimal lng)> coordinates)
+
+        static public double AreaInMetrs(IList<Point> coordinates)
         {
             //var azimuts = GetAzimuts(coordinates);
             var az = GetListAz(coordinates);
