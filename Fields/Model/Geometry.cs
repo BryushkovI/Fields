@@ -91,13 +91,6 @@ namespace Fields.Model
 
             polygon.ExteriorRing = ring;
 
-            Aspose.Gis.Geometries.LineString points = new();
-
-            points.SpatialReferenceSystem = SpatialReferenceSystem.Wgs84;
-            points.AddPoint((double)lat, (double)lng);
-            points.AddPoint(90, 0);
-
-
             Aspose.Gis.Geometries.Point point = new Aspose.Gis.Geometries.Point((double) lat, (double) lng);
             point.SpatialReferenceSystem = SpatialReferenceSystem.Wgs84;
 
