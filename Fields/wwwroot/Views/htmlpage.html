@@ -38,20 +38,14 @@
             <button type="submit">Запросить расстояние</button>
         </form>
         <hr />
-        <!-- Форма 4: Запрашивает принадлежность точки к полю -->
+        <!-- Форма 4: Запрашивает принадлежность точки к полям -->
         <form id="pointBelongingForm" action="Belonging">
-            <h2>Принадлежность точки к полю</h2>
+            <h2>Принадлежность точки к полям</h2>
             <label for="lat">Широта:</label>
             <input type="number" step="any" id="lat" name="lat" required>
 
             <label for="lat">Долгота:</label>
             <input type="number" step="any" id="lng" name="lng" required>
-
-            <label for="idField">ID:</label>
-            <input type="number" id="idField" name="idField" required>
-
-            <label for="name">Имя поля:</label>
-            <input type="text" id="name" name="name" required>
 
             <button type="submit">Проверить принадлежность</button>
         </form>

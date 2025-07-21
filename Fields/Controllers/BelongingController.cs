@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Aspose.Drawing;
+using Aspose.Gis;
+using Fields.Model;
+using Fields.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Fields.Controllers
 {
@@ -7,9 +11,17 @@ namespace Fields.Controllers
     {
         [HttpGet]
         [Route("[controller]")]
-        public async Task<string> Index(decimal? lat, decimal? lng, int id, string name)
+        public async Task<string> Get(decimal lat, decimal lng)
         {
-            return "View()";
+            var fields = DataProvider.ParseFieldsKML();
+            foreach (var item in fields)
+            {
+                if (Geometry.IsInnerPoint(item.Locations.Polygon, lat, lng))
+                {
+                    return $"{item.Id}, {item.Name}";
+                }
+            }
+            return false.ToString();
         }
     }
 }

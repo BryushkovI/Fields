@@ -1,4 +1,7 @@
 ﻿using Aspose.Gis.Common;
+using Aspose.Gis.Common.Formats.MapInfo.GraphicalObjects;
+using Aspose.Gis.Geometries;
+using Aspose.Gis.SpatialReferencing;
 using System.Runtime.CompilerServices;
 
 namespace Fields.Model
@@ -6,40 +9,6 @@ namespace Fields.Model
     public class Geometry
     {
         static int earthRinMetrs = 6371009;
-        #region Старое решение
-        static double ConvertToX(float lat, float lng)
-        {
-            return earthRinMetrs * Math.Cos(float.DegreesToRadians(lat)) * Math.Cos(float.DegreesToRadians(lng));
-        }
-        static double ConvertToY(float lat, float lng)
-        {
-            return earthRinMetrs * Math.Cos(float.DegreesToRadians(lat)) * Math.Sin(float.DegreesToRadians(lng));
-        }
-        static double ConvertToZ(float lat)
-        {
-            return earthRinMetrs * Math.Sin(float.DegreesToRadians(lat));
-        }
-        /// <summary>
-        /// Конвертирует координаты широты и долготы в декартовы координаты
-        /// </summary>
-        /// <param name="latLngCoord">Координаты широты и долготы</param>
-        /// <returns>Декартовы координаты</returns>
-        static public (double, double, double) ConvertToDecart((float, float) latLngCoord)
-        {
-            return new(ConvertToX(latLngCoord.Item1, latLngCoord.Item2), ConvertToY(latLngCoord.Item1, latLngCoord.Item2), ConvertToZ(latLngCoord.Item1));
-        }
-
-        static public (double, double, double) GetVectorAB((double, double, double) pointA, (double, double, double) pointB)
-        {
-            return (pointB.Item1 - pointA.Item1, pointB.Item2 - pointA.Item2, pointB.Item3 - pointA.Item3);
-        } 
-        #endregion
-
-
-        static (double radlat, double raflng) ConvertToRad((float lat, float lng) coordinate)
-        {
-            return (Math.PI * coordinate.lat / 180, Math.PI * coordinate.lng / 180);
-        }
 
         static decimal DeltaAngle(decimal angle1, decimal angle2)
         {
@@ -48,11 +17,11 @@ namespace Fields.Model
 
 
         /// <summary>
-        /// Получение списка азимутов
+        /// Получение списка азимутов в формате от 0 до 360 градусов
         /// </summary>
         /// <param name="coordinates"></param>
         /// <returns></returns>
-        static public IList<double> GetAzimuts(IList<(decimal lat, decimal lng)> coordinates)
+        static public IList<double> GetAzimuts360(IList<Point> coordinates)
         {
             //coordinates.Add(coordinates[0]);
             IList<double> azimuts = [];
@@ -61,21 +30,78 @@ namespace Fields.Model
                 
                 var azimutRad =
                 Math.Atan2(
-                    Math.Sin(double.DegreesToRadians((double)DeltaAngle(coordinates[i].lng, coordinates[i + 1].lng)))
-                  * Math.Cos(double.DegreesToRadians((double)coordinates[i + 1].lat)),
+                    Math.Sin(double.DegreesToRadians((double)DeltaAngle(coordinates[i].Lng, coordinates[i + 1].Lng)))
+                  * Math.Cos(double.DegreesToRadians((double)coordinates[i + 1].Lat)),
 
-                    Math.Cos(double.DegreesToRadians((double)coordinates[i].lat))
-                  * Math.Sin(double.DegreesToRadians((double)coordinates[i + 1].lat))
+                    Math.Cos(double.DegreesToRadians((double)coordinates[i].Lat))
+                  * Math.Sin(double.DegreesToRadians((double)coordinates[i + 1].Lat))
             -
-                    Math.Sin(double.DegreesToRadians((double)coordinates[i].lat))
-                  * Math.Cos(double.DegreesToRadians((double)coordinates[i + 1].lat))
-                  * Math.Cos(double.DegreesToRadians((double)DeltaAngle(coordinates[i].lng, coordinates[i + 1].lng))
+                    Math.Sin(double.DegreesToRadians((double)coordinates[i].Lat))
+                  * Math.Cos(double.DegreesToRadians((double)coordinates[i + 1].Lat))
+                  * Math.Cos(double.DegreesToRadians((double)DeltaAngle(coordinates[i].Lng, coordinates[i + 1].Lng))
                 ));
 
-                azimuts.Add(azimutRad * 180 / Math.PI);
+                var azimutDeg = double.RadiansToDegrees(azimutRad);
+                if (azimutDeg < 0)
+                {
+                    azimutDeg += 360;
+                }
+                azimuts.Add(azimutDeg);
             }
 
             return azimuts;
+        }
+
+
+        /// <summary>
+        /// Возвращает список (360-градусный азимут и идет ли после него угол > 180 градусов)
+        /// </summary>
+        /// <param name="angles"></param>
+        /// <returns></returns>
+        static public List<(double deg, bool over180)> FindOver180Angles(IList<double> angles)
+        {
+            List<(double, bool)> processedAngles = [];
+            angles.Add(angles[0]);
+            double maxAngle = 0;
+            for (int i = 0; i < angles.Count - 1; i++)
+            {
+
+                if (angles[i] > angles[i+1] && angles[i] != angles.Max())
+                {
+                    processedAngles.Add((angles[i], true));
+                }
+                else
+                {
+                    processedAngles.Add((angles[i], false));
+                }
+            }
+            return processedAngles;
+        }
+
+        static public bool IsInnerPoint(IList<Point> coordinates, decimal lat, decimal lng)
+        {
+            Aspose.Gis.Geometries.Polygon polygon = new ();
+            polygon.SpatialReferenceSystem = SpatialReferenceSystem.Wgs84;
+
+            LinearRing ring = new ();
+            foreach (var item in coordinates)
+            {
+                ring.AddPoint((double)item.Lat, (double)item.Lng);
+            }
+
+            polygon.ExteriorRing = ring;
+
+            Aspose.Gis.Geometries.LineString points = new();
+
+            points.SpatialReferenceSystem = SpatialReferenceSystem.Wgs84;
+            points.AddPoint((double)lat, (double)lng);
+            points.AddPoint(90, 0);
+
+
+            Aspose.Gis.Geometries.Point point = new Aspose.Gis.Geometries.Point((double) lat, (double) lng);
+            point.SpatialReferenceSystem = SpatialReferenceSystem.Wgs84;
+
+            return polygon.Covers(point);
         }
 
 
@@ -180,16 +206,6 @@ namespace Fields.Model
             double dist = Math.Round(2 * earthRinMetrs * Math.Asin(Math.Sqrt(InnerAngleRad(pointA, pointB))));
             
             return dist;
-        }
-
-
-        static float ConvertToLat(double z)
-        {
-            return (float) Math.Asin(z / earthRinMetrs);
-        }
-        static float ConvertToLng(double x, double y)
-        {
-            return (float)Math.Atan2(y, x);
         }
 
         
